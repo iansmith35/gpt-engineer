@@ -2,6 +2,7 @@
 Railway deployment server for gpt-engineer.
 Provides a simple web API to interact with gpt-engineer.
 """
+
 import os
 import shutil
 import tempfile
@@ -220,7 +221,9 @@ async def get_project(project_id: str):
 async def get_project_files(project_id: str):
     """
     Return the contents of all files in a project as a mapping of relative path -> content.
+
     Any file that fails to be read will appear with a value "Error reading file: <error details>".
+
 
     Args:
         project_id: The project identifier
@@ -236,11 +239,13 @@ async def get_project_files(project_id: str):
     files_content = {}
     for file_path in project_path.rglob("*"):
         if file_path.is_file():
+            fallback_key = str(file_path)
             try:
                 relative_path = str(file_path.relative_to(project_path))
                 with open(file_path, "r", encoding="utf-8") as f:
                     files_content[relative_path] = f.read()
             except Exception as e:
+
                 # Use file_path.name as fallback if relative_path calculation failed
                 key = (
                     str(file_path.relative_to(project_path))
@@ -250,6 +255,7 @@ async def get_project_files(project_id: str):
                 files_content[key] = f"Error reading file: {str(e)}"
 
     return {"project_id": project_id, "files": files_content}
+
 
 
 @app.get("/project/{project_id}/download/{filepath:path}")
@@ -325,8 +331,13 @@ async def list_projects():
 
 
 if __name__ == "__main__":
+
+
     try:
         port = int(os.environ.get("PORT", "8000"))
     except ValueError:
         port = 8000
+
+
+
     uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
