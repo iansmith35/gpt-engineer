@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["python310", "poetry"]
+
+[phases.install]
+cmds = ["poetry config virtualenvs.create false", "poetry install --only main"]
+
+[start]
+cmd = "python server.py"
