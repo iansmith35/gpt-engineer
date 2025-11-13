@@ -2,28 +2,31 @@
 Railway deployment server for gpt-engineer.
 Provides a simple web API to interact with gpt-engineer.
 """
+
 import os
-import tempfile
 import shutil
+import tempfile
+
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
+
+import uvicorn
+
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from datetime import datetime
-import uvicorn
-import json
 
+from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.core.ai import AI
-from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
+from gpt_engineer.core.default.disk_memory import DiskMemory
+from gpt_engineer.core.default.file_store import FileStore
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH, memory_path
+from gpt_engineer.core.default.steps import execute_entrypoint, gen_code, improve_fn
 from gpt_engineer.core.preprompts_holder import PrepromptsHolder
 from gpt_engineer.core.prompt import Prompt
-from gpt_engineer.applications.cli.cli_agent import CliAgent
-from gpt_engineer.core.default.steps import gen_code, execute_entrypoint, improve_fn
-from gpt_engineer.core.default.file_store import FileStore
 
 app = FastAPI(
     title="GPT Engineer API",
@@ -217,7 +220,8 @@ async def get_project(project_id: str):
 @app.get("/project/{project_id}/files")
 async def get_project_files(project_id: str):
     """
-    Get all files content from a project.
+    Return the contents of all files in a project as a mapping of relative path -> content.
+    Any file that fails to be read will appear with a value "Error reading file: <error>".
 
     Args:
         project_id: The project identifier
@@ -233,12 +237,14 @@ async def get_project_files(project_id: str):
     files_content = {}
     for file_path in project_path.rglob("*"):
         if file_path.is_file():
+            fallback_key = str(file_path)
             try:
                 relative_path = str(file_path.relative_to(project_path))
                 with open(file_path, "r", encoding="utf-8") as f:
                     files_content[relative_path] = f.read()
             except Exception as e:
-                files_content[relative_path] = f"Error reading file: {str(e)}"
+                key = relative_path if "relative_path" in locals() else fallback_key
+                files_content[key] = f"Error reading file: {str(e)}"
 
     return files_content
 
