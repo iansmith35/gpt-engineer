@@ -222,7 +222,7 @@ async def get_project_files(project_id: str):
     """
     Return the contents of all files in a project as a mapping of relative path -> content.
 
-    Any file that fails to be read will appear with a value "Error reading file: <error message>".
+    Any file that fails to be read will appear with a value "Error reading file: <error details>".
 
 
     Args:
@@ -246,9 +246,13 @@ async def get_project_files(project_id: str):
                     files_content[relative_path] = f.read()
             except Exception as e:
 
-                # Use fallback key to avoid referencing undefined variable
-                fallback_key = str(file_path)
-                files_content[fallback_key] = f"Error reading file: {str(e)}"
+                # Use file_path.name as fallback if relative_path calculation failed
+                key = (
+                    str(file_path.relative_to(project_path))
+                    if project_path in file_path.parents
+                    else file_path.name
+                )
+                files_content[key] = f"Error reading file: {str(e)}"
 
     return {"project_id": project_id, "files": files_content}
 
@@ -328,9 +332,12 @@ async def list_projects():
 
 if __name__ == "__main__":
 
+
     try:
         port = int(os.environ.get("PORT", "8000"))
     except ValueError:
         port = 8000
+
+
 
     uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
