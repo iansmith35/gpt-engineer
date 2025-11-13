@@ -28,7 +28,7 @@ from gpt_engineer.core.default.file_store import FileStore
 app = FastAPI(
     title="GPT Engineer API",
     description="AI-powered code generation API",
-    version="0.3.1"
+    version="0.3.1",
 )
 
 # Mount static files if the directory exists
@@ -68,7 +68,7 @@ async def root():
     static_index = Path(__file__).parent / "static" / "index.html"
     if static_index.exists():
         return FileResponse(static_index)
-    
+
     # Fallback to JSON if no static file
     return {
         "service": "gpt-engineer",
@@ -79,9 +79,10 @@ async def root():
             "improve": "/improve",
             "project": "/project/{project_id}",
             "files": "/project/{project_id}/files",
-            "download": "/project/{project_id}/download/{filepath}"
-        }
+            "download": "/project/{project_id}/download/{filepath}",
+        },
     }
+
 
 @app.get("/api")
 async def api_info():
@@ -95,8 +96,8 @@ async def api_info():
             "improve": "/improve",
             "project": "/project/{project_id}",
             "files": "/project/{project_id}/files",
-            "download": "/project/{project_id}/download/{filepath}"
-        }
+            "download": "/project/{project_id}/download/{filepath}",
+        },
     }
 
 
@@ -110,10 +111,10 @@ async def health():
 async def generate_code(request: GenerateRequest, background_tasks: BackgroundTasks):
     """
     Generate code from a natural language prompt.
-    
+
     Args:
         request: GenerateRequest with prompt and model settings
-        
+
     Returns:
         ProjectStatus with project_id and generation details
     """
@@ -121,32 +122,34 @@ async def generate_code(request: GenerateRequest, background_tasks: BackgroundTa
     if not os.getenv("OPENAI_API_KEY") and not os.getenv("ANTHROPIC_API_KEY"):
         raise HTTPException(
             status_code=500,
-            detail="OPENAI_API_KEY or ANTHROPIC_API_KEY must be set in environment"
+            detail="OPENAI_API_KEY or ANTHROPIC_API_KEY must be set in environment",
         )
-    
+
     try:
         # Create project directory
         project_id = f"project_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         if request.project_name:
-            project_id = f"{request.project_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        
+            project_id = (
+                f"{request.project_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            )
+
         project_path = PROJECTS_DIR / project_id
         project_path.mkdir(parents=True, exist_ok=True)
-        
+
         # Initialize AI
         ai = AI(
             model_name=request.model,
             temperature=request.temperature,
         )
-        
+
         # Create prompt
         prompt = Prompt(request.prompt)
-        
+
         # Set up agent
         preprompts_holder = PrepromptsHolder(PREPROMPTS_PATH)
         memory = DiskMemory(memory_path(str(project_path)))
         execution_env = DiskExecutionEnv()
-        
+
         agent = CliAgent.with_default_config(
             memory,
             execution_env,
@@ -156,24 +159,28 @@ async def generate_code(request: GenerateRequest, background_tasks: BackgroundTa
             process_code_fn=execute_entrypoint,
             preprompts_holder=preprompts_holder,
         )
-        
+
         # Generate code
         files_dict = agent.init(prompt)
-        
+
         # Save files
         files = FileStore(str(project_path))
         files.push(files_dict)
-        
+
         # Get list of generated files
-        generated_files = [str(f.relative_to(project_path)) for f in project_path.rglob("*") if f.is_file()]
-        
+        generated_files = [
+            str(f.relative_to(project_path))
+            for f in project_path.rglob("*")
+            if f.is_file()
+        ]
+
         return ProjectStatus(
             project_id=project_id,
             status="completed",
             created_at=datetime.now().isoformat(),
-            files=generated_files
+            files=generated_files,
         )
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -182,29 +189,28 @@ async def generate_code(request: GenerateRequest, background_tasks: BackgroundTa
 async def get_project(project_id: str):
     """
     Get project status and list of files.
-    
+
     Args:
         project_id: The project identifier
-        
+
     Returns:
         ProjectStatus with project details
     """
     project_path = PROJECTS_DIR / project_id
-    
+
     if not project_path.exists():
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     # Get list of files
-    files = [str(f.relative_to(project_path)) for f in project_path.rglob("*") if f.is_file()]
-    
+    files = [
+        str(f.relative_to(project_path)) for f in project_path.rglob("*") if f.is_file()
+    ]
+
     # Get creation time
     created_at = datetime.fromtimestamp(project_path.stat().st_ctime).isoformat()
-    
+
     return ProjectStatus(
-        project_id=project_id,
-        status="completed",
-        created_at=created_at,
-        files=files
+        project_id=project_id, status="completed", created_at=created_at, files=files
     )
 
 
@@ -212,28 +218,28 @@ async def get_project(project_id: str):
 async def get_project_files(project_id: str):
     """
     Get all files content from a project.
-    
+
     Args:
         project_id: The project identifier
-        
+
     Returns:
         Dictionary of filename -> content
     """
     project_path = PROJECTS_DIR / project_id
-    
+
     if not project_path.exists():
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     files_content = {}
     for file_path in project_path.rglob("*"):
         if file_path.is_file():
             try:
                 relative_path = str(file_path.relative_to(project_path))
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     files_content[relative_path] = f.read()
             except Exception as e:
                 files_content[relative_path] = f"Error reading file: {str(e)}"
-    
+
     return files_content
 
 
@@ -241,29 +247,29 @@ async def get_project_files(project_id: str):
 async def download_file(project_id: str, filepath: str):
     """
     Download a specific file from a project.
-    
+
     Args:
         project_id: The project identifier
         filepath: Relative path to the file within the project
-        
+
     Returns:
         File content
     """
     project_path = PROJECTS_DIR / project_id
     file_path = project_path / filepath
-    
+
     if not project_path.exists():
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
-    
+
     # Security check: ensure file is within project directory
     try:
         file_path.resolve().relative_to(project_path.resolve())
     except ValueError:
         raise HTTPException(status_code=403, detail="Access denied")
-    
+
     return FileResponse(file_path)
 
 
@@ -271,18 +277,18 @@ async def download_file(project_id: str, filepath: str):
 async def delete_project(project_id: str):
     """
     Delete a project and all its files.
-    
+
     Args:
         project_id: The project identifier
-        
+
     Returns:
         Success message
     """
     project_path = PROJECTS_DIR / project_id
-    
+
     if not project_path.exists():
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     try:
         shutil.rmtree(project_path)
         return {"message": f"Project {project_id} deleted successfully"}
@@ -294,27 +300,21 @@ async def delete_project(project_id: str):
 async def list_projects():
     """
     List all available projects.
-    
+
     Returns:
         List of project IDs and their creation dates
     """
     projects = []
     for project_path in PROJECTS_DIR.iterdir():
         if project_path.is_dir():
-            created_at = datetime.fromtimestamp(project_path.stat().st_ctime).isoformat()
-            projects.append({
-                "project_id": project_path.name,
-                "created_at": created_at
-            })
-    
+            created_at = datetime.fromtimestamp(
+                project_path.stat().st_ctime
+            ).isoformat()
+            projects.append({"project_id": project_path.name, "created_at": created_at})
+
     return {"projects": projects}
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(
-        "server:app",
-        host="0.0.0.0",
-        port=port,
-        reload=False
-    )
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
