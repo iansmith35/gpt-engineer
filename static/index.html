@@ -10,14 +10,14 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -26,49 +26,49 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
-        
+
         header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        
+
         h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
         }
-        
+
         .subtitle {
             opacity: 0.9;
             font-size: 1.1em;
         }
-        
+
         .content {
             padding: 30px;
         }
-        
+
         .section {
             margin-bottom: 30px;
         }
-        
+
         .section h2 {
             color: #667eea;
             margin-bottom: 15px;
             font-size: 1.8em;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
         }
-        
+
         input, textarea, select {
             width: 100%;
             padding: 12px;
@@ -77,18 +77,18 @@
             font-size: 1em;
             transition: border-color 0.3s;
         }
-        
+
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #667eea;
         }
-        
+
         textarea {
             min-height: 120px;
             resize: vertical;
             font-family: inherit;
         }
-        
+
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -100,22 +100,22 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        
+
         button:active {
             transform: translateY(0);
         }
-        
+
         button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         #result {
             margin-top: 20px;
             padding: 20px;
@@ -124,21 +124,21 @@
             border-left: 4px solid #667eea;
             display: none;
         }
-        
+
         #result.show {
             display: block;
         }
-        
+
         #result h3 {
             color: #667eea;
             margin-bottom: 15px;
         }
-        
+
         .file-list {
             list-style: none;
             margin-top: 10px;
         }
-        
+
         .file-item {
             padding: 8px 12px;
             background: white;
@@ -148,11 +148,11 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .file-item:hover {
             background: #e9ecef;
         }
-        
+
         .view-btn {
             padding: 6px 12px;
             font-size: 0.9em;
@@ -162,23 +162,23 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        
+
         .view-btn:hover {
             background: #5568d3;
         }
-        
+
         .error {
             color: #dc3545;
             background: #f8d7da;
             border-left-color: #dc3545;
         }
-        
+
         .success {
             color: #28a745;
             background: #d4edda;
             border-left-color: #28a745;
         }
-        
+
         .info-box {
             background: #e7f3ff;
             border-left: 4px solid #2196F3;
@@ -186,18 +186,18 @@
             margin-bottom: 20px;
             border-radius: 4px;
         }
-        
+
         .info-box strong {
             color: #1976D2;
         }
-        
+
         code {
             background: #f4f4f4;
             padding: 2px 6px;
             border-radius: 3px;
             font-family: 'Courier New', monospace;
         }
-        
+
         pre {
             background: #282c34;
             color: #abb2bf;
@@ -206,7 +206,7 @@
             overflow-x: auto;
             margin-top: 10px;
         }
-        
+
         .loading {
             display: inline-block;
             width: 20px;
@@ -216,7 +216,7 @@
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -228,25 +228,25 @@
             <h1>🚀 GPT Engineer API</h1>
             <p class="subtitle">Generate complete projects with AI</p>
         </header>
-        
+
         <div class="content">
             <div class="info-box">
-                <strong>🎯 Ready to Deploy!</strong> This API is now ready to be deployed to Railway. 
+                <strong>🎯 Ready to Deploy!</strong> This API is now ready to be deployed to Railway.
                 You can test it locally here, and when you're ready, commit the changes to deploy.
             </div>
-            
+
             <div class="section">
                 <h2>Generate Code</h2>
                 <div class="info-box">
                     <strong>Note:</strong> This test interface uses a mock API key. On Railway, set your real <code>OPENAI_API_KEY</code> environment variable.
                 </div>
-                
+
                 <form id="generateForm">
                     <div class="form-group">
                         <label for="prompt">Describe what you want to build:</label>
                         <textarea id="prompt" placeholder="Example: Create a Python Flask REST API for a todo list with endpoints to add, list, update, and delete todos. Include a SQLite database." required></textarea>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="model">Model:</label>
                         <select id="model">
@@ -255,17 +255,17 @@
                             <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="temperature">Temperature (0-1):</label>
                         <input type="number" id="temperature" min="0" max="1" step="0.1" value="0.1">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="projectName">Project Name (optional):</label>
                         <input type="text" id="projectName" placeholder="my-awesome-project">
                     </div>
-                    
+
                     <button type="submit" id="submitBtn">
                         <span id="btnText">Generate Code</span>
                         <span id="btnLoading" style="display: none;">
@@ -274,12 +274,12 @@
                     </button>
                 </form>
             </div>
-            
+
             <div id="result">
                 <h3 id="resultTitle">Result</h3>
                 <div id="resultContent"></div>
             </div>
-            
+
             <div class="section" style="margin-top: 40px;">
                 <h2>📚 API Endpoints</h2>
                 <ul style="list-style: none;">
@@ -310,7 +310,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         const form = document.getElementById('generateForm');
         const result = document.getElementById('result');
@@ -319,21 +319,21 @@
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
         const btnLoading = document.getElementById('btnLoading');
-        
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const prompt = document.getElementById('prompt').value;
             const model = document.getElementById('model').value;
             const temperature = parseFloat(document.getElementById('temperature').value);
             const projectName = document.getElementById('projectName').value;
-            
+
             // Show loading state
             submitBtn.disabled = true;
             btnText.style.display = 'none';
             btnLoading.style.display = 'inline';
             result.classList.remove('show', 'error', 'success');
-            
+
             try {
                 const response = await fetch('/generate', {
                     method: 'POST',
@@ -347,20 +347,20 @@
                         project_name: projectName || null
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     resultTitle.textContent = '✅ Success!';
                     result.classList.add('show', 'success');
-                    
+
                     let html = `
                         <p><strong>Project ID:</strong> <code>${data.project_id}</code></p>
                         <p><strong>Status:</strong> ${data.status}</p>
                         <p><strong>Created:</strong> ${new Date(data.created_at).toLocaleString()}</p>
                         <p><strong>Files Generated:</strong> ${data.files.length}</p>
                     `;
-                    
+
                     if (data.files.length > 0) {
                         html += '<h4 style="margin-top: 15px;">Files:</h4><ul class="file-list">';
                         data.files.forEach(file => {
@@ -373,7 +373,7 @@
                         });
                         html += '</ul>';
                     }
-                    
+
                     resultContent.innerHTML = html;
                 } else {
                     throw new Error(data.detail || 'Generation failed');
@@ -388,12 +388,12 @@
                 btnLoading.style.display = 'none';
             }
         });
-        
+
         async function viewFile(projectId, filepath) {
             try {
                 const response = await fetch(`/project/${projectId}/download/${filepath}`);
                 const content = await response.text();
-                
+
                 const modal = document.createElement('div');
                 modal.style.cssText = `
                     position: fixed;
@@ -408,7 +408,7 @@
                     z-index: 1000;
                     padding: 20px;
                 `;
-                
+
                 modal.innerHTML = `
                     <div style="background: white; padding: 30px; border-radius: 8px; max-width: 800px; max-height: 80vh; overflow: auto; width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -418,7 +418,7 @@
                         <pre style="margin: 0;">${escapeHtml(content)}</pre>
                     </div>
                 `;
-                
+
                 document.body.appendChild(modal);
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) modal.remove();
@@ -427,7 +427,7 @@
                 alert('Error loading file: ' + error.message);
             }
         }
-        
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
